@@ -1,0 +1,100 @@
+body {
+  background-color: #fff9af;
+}
+
+.target-wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  flex-direction: column;
+  position: relative;
+}
+
+canvas {
+  border: 5px solid #3d473e;
+}
+
+input {
+  background-color: #c5f8c8 !important;
+}
+
+form.ui.message.ignored {
+  background-color: #3d473e;
+}
+form.ui.message.ignored,
+form.ui.message.ignored label {
+  color: #ffffff;
+}
+
+button.primary.ui.button,
+button.primary.ui.button:focus {
+  background-color: #e94560;
+  transition: all 0.3s;
+  padding: 0.8rem 1.4rem;
+  border: none;
+}
+
+button.primary.ui.button:hover {
+  background-color: #ba374d;
+  transform: scale(110%);
+}
+
+button.primary.ui.button:active {
+  background-color: #ba374d;
+  transform: scale(90%);
+}
+
+.bucket-labels {
+  display: flex;
+  max-width: 795px;
+  justify-content: space-around;
+}
+
+.bucket-labels > div {
+  z-index: 10;
+  margin-top: -67px;
+  min-width: 79.5px;
+  text-align: center;
+}
+
+.bucket-labels .score {
+  font-weight: bolder;
+  font-size: 20px;
+  color: #3d473e;
+}
+
+.wrapper {
+  margin: 20px;
+}
+
+.x-axis {
+  position: absolute;
+  z-index: 10;
+  top: 0px;
+  left: 10px;
+}
+
+/* .x-axis span.neck {
+  display: inline-block;
+  min-width: 200px;
+  border-bottom: 1px solid black;
+  position: relative;
+  bottom: 6px;
+  right: -9px;
+}
+
+.x-axis span.head {
+  font-size: 18px;
+} */
+
+.x-position {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  color: #273228;
+}
+
+.target-wrapper > div {
+  position: relative;
+}
