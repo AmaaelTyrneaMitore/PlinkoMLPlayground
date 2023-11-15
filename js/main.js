@@ -17,8 +17,11 @@ const runAnalysis = () => {
   // Define the size of the test set
   const testSetSize = 100;
 
+  // Normalize the data using min-max normalization with 1 feature
+  const normalizedData = minMaxNormalization(observations, 1);
+
   // Split the dataset into training and test sets
-  const [testSet, trainingSet] = splitDataset(observations, testSetSize);
+  const [testSet, trainingSet] = splitDataset(normalizedData, testSetSize);
 
   // Iterate over a range of k values from 1 to 20
   _.range(1, 21).forEach((k) => {
@@ -90,4 +93,26 @@ const calculateAccuracy = (testSet, trainingSet, k) => {
       .divide(testSet.length)
       .value()
   );
+};
+
+// Helper function to normalize/scale the data using the min-max algorithm
+const minMaxNormalization = (data, featureCount) => {
+  const clonedData = _.cloneDeep(data);
+
+  // Iterate over each feature column to perform min-max normalization
+  for (let featureIndex = 0; featureIndex < featureCount; featureIndex++) {
+    // Extract the values of a specific feature column
+    const column = clonedData.map((observation) => observation[featureIndex]);
+
+    // Calculate the minimum and maximum values of the feature column
+    const min = _.min(column);
+    const max = _.max(column);
+
+    // Normalize each value in the feature column using min-max scaling formula
+    for (let rowIndex = 0; rowIndex < clonedData.length; rowIndex++) {
+      clonedData[rowIndex][featureIndex] = (clonedData[rowIndex][featureIndex] - min) / (max - min);
+    }
+  }
+
+  return clonedData;
 };
