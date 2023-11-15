@@ -49,9 +49,22 @@ const knn = (data, predictionPoint, k) => {
   );
 };
 
-// Helper function to calculate the distance from the drop point to the prediction point
-const calculateDistance = (dropPosition, predictionPoint) =>
-  Math.abs(dropPosition - predictionPoint);
+/**
+ * Helper function to calculate the Euclidean distance between two points with an
+ * arbitrary number of features using the Pythagorean theorem
+ */
+const calculateDistance = (pointA, pointB) => {
+  return Math.sqrt(
+    _.chain(pointA)
+      // Zip the arrays to pair up corresponding features
+      .zip(pointB)
+      // Calculate squared differences for each feature pair
+      .map(([a, b]) => (a - b) ** 2)
+      // Sum up the squared differences
+      .sum()
+      .value(),
+  );
+};
 
 // Helper function to split dataset into training and test sets
 const splitDataset = (data, testCount) => {
@@ -68,7 +81,10 @@ const calculateAccuracy = (testSet, trainingSet, k) => {
   return (
     _.chain(testSet)
       // Filter test set records based on the accuracy of the k-Nearest Neighbours prediction
-      .filter((testObservation) => knn(trainingSet, testObservation[0], k) === testObservation[3])
+      .filter(
+        (testObservation) =>
+          knn(trainingSet, _.initial(testObservation), k) === _.last(testObservation),
+      )
       // Calculate accuracy as the ratio of correct predictions to the total test set size
       .size()
       .divide(testSet.length)
