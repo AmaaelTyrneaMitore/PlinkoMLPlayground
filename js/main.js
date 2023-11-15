@@ -3,8 +3,6 @@
  * Observations include drop position, bounciness, size and bucket label
  */
 const observations = [];
-// Number of k-Nearest records
-const k = 3;
 
 /**
  * Callback when a ball enters the bucket.
@@ -14,7 +12,7 @@ const onScoreUpdate = (dropPosition, bounciness, size, bucketLabel) => {
   observations.push([dropPosition, bounciness, size, bucketLabel]);
 };
 
-// Analyze function to predict the bucket using k-Nearest Neighbours
+// Analyze function to find the optimal K value for k-Nearest Neighbours
 const runAnalysis = () => {
   // Define the size of the test set
   const testSetSize = 100;
@@ -22,13 +20,16 @@ const runAnalysis = () => {
   // Split the dataset into training and test sets
   const [testSet, trainingSet] = splitDataset(observations, testSetSize);
 
-  // Calculate accuracy by comparing predicted buckets with actual buckets in test set
-  const accuracy = calculateAccuracy(testSet, trainingSet);
-  console.log(`Accuracy: ${accuracy}`);
+  // Iterate over a range of k values from 1 to 20
+  _.range(1, 21).forEach((k) => {
+    // Calculate accuracy by comparing predicted buckets with actual buckets in test set for each k value
+    const accuracy = calculateAccuracy(testSet, trainingSet, k);
+    console.log(`K: ${k}\tAccuracy: ${accuracy}`);
+  });
 };
 
 // Fully generalized k-Nearest Neighbours function
-const knn = (data, predictionPoint) => {
+const knn = (data, predictionPoint, k) => {
   return (
     _.chain(data)
       // Calculate the distance and associate it with the bucket label
@@ -54,17 +55,23 @@ const calculateDistance = (dropPosition, predictionPoint) =>
 
 // Helper function to split dataset into training and test sets
 const splitDataset = (data, testCount) => {
+  // Shuffle the data to ensure randomness
   const shuffled = _.shuffle(data);
+  // Split the data into test and training sets
   const testSet = _.slice(shuffled, 0, testCount);
   const trainingSet = _.slice(shuffled, testCount);
   return [testSet, trainingSet];
 };
 
 // Helper function to calculate the accuracy of the k-Nearest Neighbours algorithm
-const calculateAccuracy = (testSet, trainingSet) => {
-  return _.chain(testSet)
-    .filter((testObservation) => knn(trainingSet, testObservation[0]) === testObservation[3])
-    .size()
-    .divide(testSet.length)
-    .value();
+const calculateAccuracy = (testSet, trainingSet, k) => {
+  return (
+    _.chain(testSet)
+      // Filter test set records based on the accuracy of the k-Nearest Neighbours prediction
+      .filter((testObservation) => knn(trainingSet, testObservation[0], k) === testObservation[3])
+      // Calculate accuracy as the ratio of correct predictions to the total test set size
+      .size()
+      .divide(testSet.length)
+      .value()
+  );
 };
