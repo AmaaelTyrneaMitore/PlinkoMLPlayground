@@ -12,22 +12,27 @@ const onScoreUpdate = (dropPosition, bounciness, size, bucketLabel) => {
   observations.push([dropPosition, bounciness, size, bucketLabel]);
 };
 
-// Analyze function to find the optimal K value for k-Nearest Neighbours
+/*
+ * Analyze function to find the accuracy of KNN for each specific feature
+ * Calculates accuracy for each feature with the optimal k value
+ */
 const runAnalysis = () => {
   // Define the size of the test set
   const testSetSize = 100;
+  // The optimal value of k that I found by comparing accuracy for each value of k
+  const k = 10;
 
-  // Normalize the data using min-max normalization with 1 feature
-  const normalizedData = minMaxNormalization(observations, 1);
-
-  // Split the dataset into training and test sets
-  const [testSet, trainingSet] = splitDataset(normalizedData, testSetSize);
-
-  // Iterate over a range of k values from 1 to 20
-  _.range(1, 21).forEach((k) => {
-    // Calculate accuracy by comparing predicted buckets with actual buckets in test set for each k value
+  // Iterate over a every feature to find it's accuracy
+  _.range(0, 3).forEach((feature) => {
+    // Create a dataset for a specific feature
+    const data = _.map(observations, (observation) => [observation[feature], _.last(observation)]);
+    // Normalize the data using min-max normalization for only 1 feature
+    const normalizedData = minMaxNormalization(data, 1);
+    // Split the normalized dataset into training and test sets
+    const [testSet, trainingSet] = splitDataset(normalizedData, testSetSize);
+    // Calculate accuracy for the given feature with the optimal k value
     const accuracy = calculateAccuracy(testSet, trainingSet, k);
-    console.log(`K: ${k}\tAccuracy: ${accuracy}`);
+    console.log(`Feature: ${feature}\tAccuracy: ${accuracy}`);
   });
 };
 
@@ -36,7 +41,10 @@ const knn = (data, predictionPoint, k) => {
   return (
     _.chain(data)
       // Calculate the distance and associate it with the bucket label
-      .map((observation) => [calculateDistance(observation[0], predictionPoint), observation[3]])
+      .map((observation) => [
+        calculateDistance(_.initial(observation), predictionPoint),
+        _.last(observation),
+      ])
       // Sort by distance and take the top k records
       .sortBy((observation) => observation[0])
       .slice(0, k)
